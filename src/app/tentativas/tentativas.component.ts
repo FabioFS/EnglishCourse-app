@@ -31,9 +31,7 @@ export class TentativasComponent implements OnChanges {
 
       this.coracoes[indice - 1].cheio = false
     }
-    
 
-    console.log("tentativas: ", this.tentativas)
   }
 
 }

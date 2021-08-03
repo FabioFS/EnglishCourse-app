@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, EventEmitter, Output, OnDestroy } from '@angular/core';
 
 import { Frase } from '../shared/frase.model';
 import { FRASES } from './frases.mock';
@@ -15,21 +15,31 @@ export class PainelComponent implements OnInit {
   public resposta: string = ''
 
   public rodada: number = 0
-  public rodadaFrase: Frase
+  public rodadaFrase!: Frase;
 
   public progresso: number = 0
 
   public tentativas: number = 3
 
+  @Output() public encerrarJogo: EventEmitter<string> = new EventEmitter()
+
   constructor() { 
-    this.rodadaFrase = this.frases[this.rodada]
-    console.log(this.rodadaFrase) }
+    this.atualizaRodada()
+  }
 
   ngOnInit(): void {
   }
 
+  ngOnDestroy(): void {
+
+  }
+
   public atualizaResposta(resposta: Event): void {
     this.resposta = (<HTMLInputElement>resposta.target).value
+  }
+
+  public atualizaRodada(): void {
+    this.rodadaFrase = this.frases[this.rodada]
   }
 
   public verificarResposta(): void{
@@ -42,17 +52,23 @@ export class PainelComponent implements OnInit {
 
       this.progresso = this.progresso + (100 / this.frases.length)
 
-      this.rodadaFrase = this.frases[this.rodada]
+      if(this.rodada === 4) {
+         alert('Parabéns! Você Ganhou!')
+         this.encerrarJogo.emit('vitoria')
+      }
+
+      this.atualizaRodada()
       
     } else {
       alert('Tradução incorreta! Tente novamente.')
       this.tentativas--
       
-      if(this.tentativas===-1){
+      if(this.tentativas === -1){
         alert('Game Over!!! Tente novamente')
         this.rodada = 0
         this.progresso = 0
         this.tentativas = 3
+        this.encerrarJogo.emit('derrota')
       }
     }
       this.resposta=""
